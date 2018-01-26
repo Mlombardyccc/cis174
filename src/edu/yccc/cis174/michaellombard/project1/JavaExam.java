@@ -6,6 +6,9 @@ import java.util.List;
 import edu.yccc.cis174.michaellombard.gettingstarted.Book;
 
 public class JavaExam {
+	int numberOfQuestions = 10;
+	int numberOfAnswers = 4;
+	
 	public static void main(String[] args) {  
 		//Creating list of books  
 		List<Book> booklist=new ArrayList<Book>();  
