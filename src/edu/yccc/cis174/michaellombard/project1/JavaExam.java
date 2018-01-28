@@ -1,47 +1,100 @@
 package edu.yccc.cis174.michaellombard.project1;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
 
 
 
 public class JavaExam {
 
 	public static void main(String[] args) throws NumberFormatException, IOException {  
+		Scanner scanner = new Scanner(System.in);
 		int numberOfQuestions = 10;//maximum number of questions on the test
 		int numberOfAnswers = 4;//maximum number of answers per question
+		int passFailCutoff = 70;
+		int rightAnswers = 0;
 		List<QuestionWithAnswer> qalist = GenerateTest(numberOfQuestions,numberOfAnswers);	
 		//get tester info
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        System.out.print("Please enter your last name : ");
-        String lastName = null;
-        try {
-        	lastName = reader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } 
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		System.out.print("Please enter your last name : ");
+		String lastName = "";
+		try {
+			lastName = reader.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
 
-        System.out.print("Please enter your first name : ");
-        String firstName = null;
-        try {
-        	firstName = reader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } 
-        System.out.print("Press any key when ready to begin test...");
-
-        
+		System.out.print("Please enter your first name : ");
+		String firstName = "";
+		try {
+			firstName = reader.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		System.out.print("Press enter when ready to begin test...");
+		scanner.nextLine();
+		String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+		long startTime = System.currentTimeMillis();
 		for(QuestionWithAnswer qa:qalist){  
-			System.out.println(qa.question + "\n" + qa.answer + qa.correctAnswer + "\n\n");  
+			System.out.println(qa.question + "\n\n" + qa.answer);
+			String answer = "";
+			while (answer.length() != 1) {
+				answer = scanner.nextLine();
+			}
+			if (answer.equalsIgnoreCase(qa.correctAnswer)) {rightAnswers++;}
 		}  
+
+		long endTime = System.currentTimeMillis();
+		long seconds = (endTime - startTime) / 1000;
+
+		scanner.close();
 		//record and display result of exam
+		int examScore = Math.round((rightAnswers/numberOfQuestions)*100);
+		String takerInfo = lastName + "-:;,-" + firstName +  "-:;,-" + timeStamp +  "-:;,-" + examScore +  "-:;,-" + seconds;
+
+		BufferedWriter bw = null;
+		FileWriter fw = null;
+		try {
+			File file = new File("D:\\School\\cis174\\git\\cis174\\src\\edu\\yccc\\cis174\\michaellombard\\project1\\takers.sto");
+			// if file doesn't exists, then create it
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			fw = new FileWriter(file.getAbsoluteFile(), true);
+			bw = new BufferedWriter(fw);
+			bw.write(takerInfo);
+			bw.newLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (bw != null)
+					bw.close();
+				if (fw != null)
+					fw.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+
+		if (passFailCutoff <= examScore) {
+			System.out.println("Congratulations " + firstName + " " + lastName + "! You scored a " + examScore + "!");
+		} else {
+			System.out.println("Sorry " + firstName + " " + lastName + ". You scored a " + examScore + ". Better luck next time.");
+		}
 	}  
 
 	public static List<QuestionWithAnswer> GenerateTest(int numberOfQuestions, int numberOfAnswers) throws NumberFormatException, IOException {  
