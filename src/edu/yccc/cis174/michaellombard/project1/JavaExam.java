@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,51 +23,48 @@ public class JavaExam {
 		Scanner scanner = new Scanner(System.in);
 		int numberOfQuestions = 10;//maximum number of questions on the test
 		int numberOfAnswers = 4;//maximum number of answers per question
-		int passFailCutoff = 70;
+		int passFailCutoff = 70;//Happy result/unhappy result changeover point
+		
 		int rightAnswers = 0;
 		List<QuestionWithAnswer> qalist = GenerateTest(numberOfQuestions,numberOfAnswers);	
 		//get tester info
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		System.out.print("Please enter your last name : ");
-		String lastName = "";
-		try {
-			lastName = reader.readLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-
+		String lastName = scanner.nextLine();
 		System.out.print("Please enter your first name : ");
-		String firstName = "";
-		try {
-			firstName = reader.readLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
+		String firstName = scanner.nextLine();
 		System.out.print("Press enter when ready to begin test...");
 		scanner.nextLine();
-		String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-		long startTime = System.currentTimeMillis();
+		String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());//init timestamp with start of exam not start of registration
+		long startTime = System.currentTimeMillis();//Start timer
 		for(QuestionWithAnswer qa:qalist){  
-			System.out.println(qa.question + "\n\n" + qa.answer);
+			System.out.println(qa.question + "\n\n" + qa.answer);//display question with possible answers
 			String answer = "";
-			while (answer.length() != 1) {
-				answer = scanner.nextLine();
+			while (answer.length() != 1) {//if answer is blank or more than 1 character, repeat request for answer
+				answer = scanner.nextLine();//await answer
+				if (answer.length() != 1) {System.out.println("Invalid Answer, try again. \n");}
 			}
 			if (answer.equalsIgnoreCase(qa.correctAnswer)) {rightAnswers++;}
 		}  
 
-		long endTime = System.currentTimeMillis();
-		long seconds = (endTime - startTime) / 1000;
-
+		long endTime = System.currentTimeMillis();//end timer
+		long seconds = (endTime - startTime) / 1000;//calculate time until completion in seconds
 		scanner.close();
 		//record and display result of exam
-		int examScore = Math.round((rightAnswers/numberOfQuestions)*100);
+		int examScore = (int)Math.round((((double)rightAnswers)/numberOfQuestions)*100);
 		String takerInfo = lastName + "-:;,-" + firstName +  "-:;,-" + timeStamp +  "-:;,-" + examScore +  "-:;,-" + seconds;
 
 		BufferedWriter bw = null;
 		FileWriter fw = null;
+	    String pathToClass = JavaExam.class.getName();
+	    pathToClass = pathToClass.replace(".", ",");
+	    String[] pathItems = pathToClass.split(",");
+	    String pathToClassDir = "";
+	    for (int i = 0; i < (pathItems.length - 1); i++) {
+	    	pathToClassDir = pathToClassDir + pathItems[i] + "\\\\";
+	    }
+	    String pathToFile = System.getProperty("user.dir").replace("\\","\\\\") + "\\\\src\\\\" + pathToClassDir;
 		try {
-			File file = new File("D:\\School\\cis174\\git\\cis174\\src\\edu\\yccc\\cis174\\michaellombard\\project1\\takers.sto");
+			File file = new File(pathToFile + "takers.sto");
 			// if file doesn't exists, then create it
 			if (!file.exists()) {
 				file.createNewFile();
@@ -106,10 +102,18 @@ public class JavaExam {
 	    List<ExamQuestion> questionlist = new ArrayList<ExamQuestion>();
 		List<ExamAnswer> answerlist = new ArrayList<ExamAnswer>();
 		List<QuestionWithAnswer> qalist = new ArrayList<QuestionWithAnswer>();
-		//Import Questions
+	    String thisLine = null;
+	    String pathToClass = JavaExam.class.getName();
+	    pathToClass = pathToClass.replace(".", ",");
+	    String[] pathItems = pathToClass.split(",");
+	    String pathToClassDir = "";
+	    for (int i = 0; i < (pathItems.length - 1); i++) {
+	    	pathToClassDir = pathToClassDir + pathItems[i] + "\\\\";
+	    }
+	    String pathToFile = System.getProperty("user.dir").replace("\\","\\\\") + "\\\\src\\\\" + pathToClassDir;
+	    //Import Questions
 		try {
-		    String thisLine = null;
-            BufferedReader inFile = new BufferedReader(new FileReader("D:\\School\\cis174\\git\\cis174\\src\\edu\\yccc\\cis174\\michaellombard\\project1\\questions.sto"));
+            BufferedReader inFile = new BufferedReader(new FileReader(pathToFile + "questions.sto"));
 			while ((thisLine = inFile.readLine()) != null) {
 //				System.out.println(thisLine);  
 				String[] items = thisLine.split("-:;,-");
@@ -127,8 +131,7 @@ public class JavaExam {
 
 		//Import Answers
 		try {
-		    String thisLine = null;
-            BufferedReader inFile = new BufferedReader(new FileReader("D:\\School\\cis174\\git\\cis174\\src\\edu\\yccc\\cis174\\michaellombard\\project1\\answers.sto"));
+            BufferedReader inFile = new BufferedReader(new FileReader(pathToFile + "answers.sto"));
 			while ((thisLine = inFile.readLine()) != null) {
 //	     		System.out.println(thisLine);  
 				String[] items = thisLine.split("-:;,-");
