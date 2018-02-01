@@ -1,7 +1,11 @@
 package edu.yccc.cis174.michaellombard.bigproject1;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class QuestionWithAnswer {
-	String question, answer, correctAnswer;
+	String question;
+	List<ExamAnswer> answerList = new ArrayList<ExamAnswer>();
 	
 	public String getQuestion() {
 		return question;
@@ -11,26 +15,17 @@ public class QuestionWithAnswer {
 		this.question = question;
 	}
 
-	public String getAnswer() {
-		return answer;
+	public List<ExamAnswer> getAnswerList() {
+		return answerList;
 	}
 
-	public void setAnswer(String answer) {
-		this.answer = answer;
+	public void setAnswer(List<ExamAnswer> answerList) {
+		this.answerList = answerList;
 	}
 
-	public String getCorrectAnswer() {
-		return correctAnswer;
-	}
-
-	public void setCorrectAnswer(String correctAnswer) {
-		this.correctAnswer = correctAnswer;
-	}
-
-	public QuestionWithAnswer(String question, String answer, String correctAnswer) {
+	public QuestionWithAnswer(String question, List<ExamAnswer> answerList) {
 		this.question = question;
-		this.answer = answer;
-		this.correctAnswer = correctAnswer;
+		this.answerList = answerList;
 	}
 
 	public QuestionWithAnswer() {

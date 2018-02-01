@@ -17,18 +17,22 @@ import java.util.Scanner;
 
 
 
-public class JavaExam {
+public class JavaExam 
+{
 
-	public static void main(String[] args) throws NumberFormatException, IOException {  
+
+	public static void main(String[] args) throws NumberFormatException, IOException 
+	{  
 		
 		//TESTING VARIABLE INITIALIZATION START\\
-		int numberOfQuestions = 10;//maximum number of questions on the test
-		int numberOfAnswers = 4;//maximum number of answers per question
-		int passFailCutoff = 70;//Happy result/unhappy result changeover point
+		int numberOfQuestions = initExam("numberOfQuestions");//maximum number of questions on the test
+		int numberOfAnswers = initExam("numberOfAnswers");//maximum number of answers per question
+		int passFailCutoff = initExam("passFailCutoff");//Happy result/unhappy result changeover point
+		int answerType = initExam("answerType");//Type of question numbers or letters
 		//TESTING VARIABLE INITIALIZATION END\\
 		
 		//GENERATE EXAM START\\
-		List<QuestionWithAnswer> qalist = GenerateTest(numberOfQuestions,numberOfAnswers);	//Generate this exam
+		List<QuestionWithAnswer> qalist = generateTest(numberOfQuestions,numberOfAnswers);	//Generate this exam
 		//GENERATE EXAM END\\
 
 		//GET EXAM TAKER DATA START\\
@@ -51,14 +55,32 @@ public class JavaExam {
 		//TIMER AND TIMESTAMP INITIALIZATION END\\
 		
 		//EXAM QUESTIONS START\\
-		for(QuestionWithAnswer qa:qalist){  
-			System.out.println(qa.question + "\n\n" + qa.answer);//display question with possible answers
+		int currentQuestion = 0;
+		for(QuestionWithAnswer qa:qalist)
+		{
+			currentQuestion++;
+			System.out.println(currentQuestion + ") " + qa.question + "\n\n");//display question with possible answers
+		    int currentAnswer = 1;
+		    int correctAnswer = 0;
+			for(ExamAnswer a:qa.answerList){  
+		    	System.out.println(FormatKeys.setAnswerFormat(answerType, currentAnswer) + ") " + a.answer);
+		    	if (a.isCorrect) {correctAnswer = currentAnswer;}
+		    	currentAnswer++;
+		    }
 			String answer = "";
-			while (answer.length() != 1) {//if answer is blank or more than 1 character, repeat request for answer
+			while (answer.length() < FormatKeys.setAnswerFormat(answerType,"min") || answer.length() > FormatKeys.setAnswerFormat(answerType,"max")) 
+			{//if answer is blank or more than 1 character, repeat request for answer
 				answer = scanner.nextLine();//await answer
-				if (answer.length() != 1) {System.out.println("Invalid Answer, try again. \n");}
+				if (answer.length() < FormatKeys.setAnswerFormat(answerType,"min") || answer.length() > FormatKeys.setAnswerFormat(answerType,"max")) 
+				{
+					System.out.println("Invalid answer. Please retry.\n");
+				}
 			}
-			if (answer.equalsIgnoreCase(qa.correctAnswer)) {rightAnswers++;}
+			if (answer.equalsIgnoreCase(FormatKeys.setAnswerFormat(answerType, correctAnswer))) 
+			{
+				rightAnswers++;
+			}
+			
 		}  
 		scanner.close();//close input detector
 		//EXAM QUESTIONS END\\
@@ -80,7 +102,25 @@ public class JavaExam {
 		//RECORD AND DISPLAY EXAM RESULT END\\
 	}  
 
-	
+	public static int initExam(String whichCriteria) throws IOException {
+		int value = -1;
+		try {
+			BufferedReader inFile = new BufferedReader(new FileReader(findPath() + "exam.sto"));
+			String thisLine;
+			while ((thisLine = inFile.readLine()) != null) {
+				String[] nqitems = thisLine.split(";");
+				String[] nqsubitems = nqitems[0].split("=");
+				if (whichCriteria.equalsIgnoreCase(nqsubitems[0].trim())) {
+				value = Integer.valueOf(nqsubitems[1].trim());//maximum number of questions on the test
+				}
+			}
+			inFile.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return value;
+
+	}
 	public static void writeResult(String takerInfo) {
 		BufferedWriter bw = null;
 		FileWriter fw = null;
@@ -127,7 +167,7 @@ public class JavaExam {
 	}
 
 	
-	public static List<QuestionWithAnswer> GenerateTest(int numberOfQuestions, int numberOfAnswers) throws NumberFormatException, IOException {  
+	public static List<QuestionWithAnswer> generateTest(int numberOfQuestions, int numberOfAnswers) throws NumberFormatException, IOException {  
 		int fileNumberOfQuestions = 0;//initialize counter for number of questions in the file
 		if (numberOfAnswers > 26) { //checks if more answers per question selected than letters in alphabet and sets to max letters if so
 			numberOfAnswers = 26;
@@ -171,32 +211,17 @@ public class JavaExam {
 	    List<ExamQuestion> copy = new LinkedList<ExamQuestion>(questionlist);
 	    Collections.shuffle(copy);
 	    List<ExamQuestion> randQuestions = copy.subList(0, numberOfQuestions);//randomize questions and set to number selected by numberOfQuestions
-
-	    int currentQuestion = 1;//initialize question counter
-
 		//Combine Questions and Answers		
 	    for(ExamQuestion r:randQuestions){  
-			List<ExamAnswer> sa = SortedAnswers(numberOfAnswers, r.id, answerlist);
-			String thisQuestion = "";
-		    int currentAnswer = 1;
-		    int rightAnswer = 0;
-		    String wholeAnswer = "";
-		    for(ExamAnswer a:sa){  
-				wholeAnswer = wholeAnswer + ConvertToLetter(currentAnswer) + ") " + a.answer + "\n";
-				if (a.isCorrect) {rightAnswer = currentAnswer;}
-				currentAnswer++;			
-		    }
-			wholeAnswer = wholeAnswer + "\n";
-			thisQuestion = currentQuestion + ") " + r.question;
-		    qalist.add(new QuestionWithAnswer(thisQuestion,wholeAnswer,ConvertToLetter(rightAnswer)));
-		    currentQuestion++;
+			List<ExamAnswer> sortedAnswerList = sortedAnswers(numberOfAnswers, r.id, answerlist);
+		    qalist.add(new QuestionWithAnswer(r.question,sortedAnswerList));
 		}
 
 	    return qalist;
 	}  
 
 
-    public static List<ExamAnswer> SortedAnswers(int listLength, int questionId, List<ExamAnswer> listToSort) {//Sorts and shuffles exam answers
+    public static List<ExamAnswer> sortedAnswers(int listLength, int questionId, List<ExamAnswer> listToSort) {//Sorts and shuffles exam answers
 	    List<ExamAnswer> copy = new LinkedList<ExamAnswer>(listToSort);//Make copy of original list to work with
 	    List<ExamAnswer> copyb = new ArrayList<ExamAnswer>();
 		int numAnswers = 0;
@@ -215,10 +240,7 @@ public class JavaExam {
     }
 
     
-    public static String ConvertToLetter(int letterId) {
-        return letterId > 0 && letterId < 27 ? String.valueOf((char)(letterId + 64)) : null;//find and return ascii value of modified number(limits to capital letters)
-    }
-}
+ }
 
 
 
