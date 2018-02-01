@@ -1,7 +1,7 @@
 package edu.yccc.cis174.michaellombard.bigproject1;
 
 import java.util.Comparator;
-
+ 
 public class ExamAnswer {
 	int id;
 	int questionId;
