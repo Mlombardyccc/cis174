@@ -47,5 +47,10 @@ public class ExamQuestion {
 	public ExamQuestion() {
 		
 	}
+	public String toString() {
+		String thisString = Integer.toString(id) + " " + question + " " + category + " " + difficulty;
+		return thisString;
+		
+	}
 	
 }
