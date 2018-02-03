@@ -33,7 +33,11 @@ public class FormatKeys {
     	 */
    	String convertedAnswer = "---";
     	if (formatType == 1) {
-    		convertedAnswer = answerValue > 0 && answerValue < 27 ? String.valueOf((char)(answerValue + 64)) : null;//find and return ASCII value of modified number(limits to capital letters)
+    		if (answerValue > 0 && answerValue < 27) {
+    			convertedAnswer = String.valueOf((char)(answerValue + 64));//find and return ASCII value of modified number(limits to capital letters)
+    		} else {
+    			convertedAnswer = Integer.toString(answerValue);
+    		}
     	} else if (formatType == 2) {
     		int answerValuea = (answerValue/26) + 1;
     		int answerValueb = (answerValue%26);
@@ -48,7 +52,7 @@ public class FormatKeys {
    	return convertedAnswer;
     }
 
-    public static int setAnswerFormat(int formatType,String minOrMax) {
+    public static int setAnswerFormat(int formatType, String minOrMax) {
     	/* Answer Types are as follows:
     	 * 1 = Letter, only 26 options available
     	 * 2 = DoubleLetter, 26*26 options available

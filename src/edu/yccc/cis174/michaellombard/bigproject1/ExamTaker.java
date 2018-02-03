@@ -2,7 +2,24 @@ package edu.yccc.cis174.michaellombard.bigproject1;
 
 public class ExamTaker {
 	int id;
-	String lastName,firstName, attemptTimeStamp;
+	String userName,email,lastName,firstName, attemptTimeStamp;
+	
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 	int attemptScore;
 	int attemptDuration;
 
@@ -54,15 +71,25 @@ public class ExamTaker {
 		this.attemptDuration = attemptDuration;
 	}
 
-	public ExamTaker(int id, String lastName, String firstName, String attemptTimeStamp, int attemptScore, int attemptDuration) {  
+	public ExamTaker(int id, String userName, String email, String lastName, String firstName, String attemptTimeStamp, int attemptScore, int attemptDuration) {  
 		this.id = id;  
+		this.userName = userName;  
+		this.email = email;  
 		this.lastName = lastName;  
 		this.firstName = firstName;  
 		this.attemptTimeStamp = attemptTimeStamp;  
 		this.attemptScore = attemptScore;  
 		this.attemptDuration = attemptDuration;  
 	}  
-	
+
+	public ExamTaker(int id, String userName, String email, String lastName, String firstName) {  
+		this.id = id;  
+		this.userName = userName;  
+		this.email = email;  
+		this.lastName = lastName;  
+		this.firstName = firstName;  
+	}  
+
 	public ExamTaker() {
 		
 	}

@@ -62,6 +62,11 @@ public class ExamAnswer {
 			return qidno1-qidno2;
 		}
 	};
+	
+	public String toString() {
+		String thisString = Integer.toString(id) + " " + questionId + " " + answer + " " + isCorrect;
+		return thisString;
+	}
 
 	/*Comparator for sorting the list by isCorrect*/
 	public static Comparator<ExamAnswer> ExamIsCorrect = new Comparator<ExamAnswer>() {

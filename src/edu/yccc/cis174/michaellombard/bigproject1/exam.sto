@@ -1,4 +1,0 @@
-numberOfQuestions = 10;//maximum number of questions on the test
-numberOfAnswers = 4;//maximum number of answers per question
-passFailCutoff = 70;//Happy result/unhappy result changeover point
-answerType = 3;//Alpha

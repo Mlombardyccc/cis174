@@ -1,11 +1,5 @@
 package edu.yccc.cis174.michaellombard.bigproject1;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,21 +8,23 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
-
+import java.util.HashMap;
+import static java.lang.Math.toIntExact;
 
 
 public class JavaExam 
 {
+	private static Scanner scanner = new Scanner(System.in);//initialize input detection
 
 
 	public static void main(String[] args) throws NumberFormatException, IOException 
 	{  
-		
 		//TESTING VARIABLE INITIALIZATION START\\
-		int numberOfQuestions = initExam("numberOfQuestions");//maximum number of questions on the test
-		int numberOfAnswers = initExam("numberOfAnswers");//maximum number of answers per question
-		int passFailCutoff = initExam("passFailCutoff");//Happy result/unhappy result changeover point
-		int answerType = initExam("answerType");//Type of question numbers or letters
+		HashMap< String,Integer> initvalues = initExam();
+		int numberOfQuestions = initvalues.get("numberOfQuestions");//maximum number of questions on the test
+		int numberOfAnswers = initvalues.get("numberOfAnswers");//maximum number of answers per question
+		int passFailCutoff = initvalues.get("passFailCutoff");//Happy result/unhappy result changeover point
+		int answerType = initvalues.get("answerType");//Type of question numbers or letters
 		//TESTING VARIABLE INITIALIZATION END\\
 		
 		//GENERATE EXAM START\\
@@ -36,17 +32,13 @@ public class JavaExam
 		//GENERATE EXAM END\\
 
 		//GET EXAM TAKER DATA START\\
-		Scanner scanner = new Scanner(System.in);//initialize input detection
-		System.out.print("Please enter your last name : ");
-		String lastName = scanner.nextLine();
-		System.out.print("Please enter your first name : ");
-		String firstName = scanner.nextLine();
+		ExamTaker userValues = doLogin();
 		//GET EXAM TAKER DATA END\\
 		
 		//WAIT FOR READINESS CONFIRMATION START\\
 		System.out.print("Press enter when ready to begin test...");
-		scanner.nextLine();
-		//WAIT FOR READINESS CONFIRMATION END\\
+		getInput();
+ 		//WAIT FOR READINESS CONFIRMATION END\\
 		
 		//TIMER AND TIMESTAMP INITIALIZATION START\\
 		String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());//init timestamp with start of exam not start of registration
@@ -70,7 +62,7 @@ public class JavaExam
 			String answer = "";
 			while (answer.length() < FormatKeys.setAnswerFormat(answerType,"min") || answer.length() > FormatKeys.setAnswerFormat(answerType,"max")) 
 			{//if answer is blank or more than 1 character, repeat request for answer
-				answer = scanner.nextLine();//await answer
+				answer = getInput();//await answer
 				if (answer.length() < FormatKeys.setAnswerFormat(answerType,"min") || answer.length() > FormatKeys.setAnswerFormat(answerType,"max")) 
 				{
 					System.out.println("Invalid answer. Please retry.\n");
@@ -82,7 +74,6 @@ public class JavaExam
 			}
 			
 		}  
-		scanner.close();//close input detector
 		//EXAM QUESTIONS END\\
 		
 		//TIMER FINISH START\\
@@ -92,62 +83,78 @@ public class JavaExam
 		
 		//RECORD AND DISPLAY EXAM RESULT START\\
 		int examScore = (int)Math.round((((double)rightAnswers)/numberOfQuestions)*100);
-		String takerInfo = lastName + "-:;,-" + firstName +  "-:;,-" + timeStamp +  "-:;,-" + examScore +  "-:;,-" + seconds;
-    	writeResult(takerInfo);
+		userValues.setAttemptTimeStamp(timeStamp);
+		userValues.setAttemptScore(examScore);
+		userValues.setAttemptDuration(toIntExact(seconds));
+    	writeResult(userValues);
 		if (passFailCutoff <= examScore) {
-			System.out.println("Congratulations " + firstName + " " + lastName + "! You scored a " + examScore + "!");
+			System.out.println("Congratulations " + userValues.getFirstName() + " " + userValues.getLastName() + "! You scored a " + examScore + "!");
 		} else {
-			System.out.println("Sorry " + firstName + " " + lastName + ". You scored a " + examScore + ". Better luck next time.");
+			System.out.println("Sorry " + userValues.getFirstName() + " " + userValues.getLastName() + ". You scored a " + examScore + ". Better luck next time.");
 		}
 		//RECORD AND DISPLAY EXAM RESULT END\\
 	}  
-
-	public static int initExam(String whichCriteria) throws IOException {
-		int value = -1;
-		try {
-			BufferedReader inFile = new BufferedReader(new FileReader(findPath() + "exam.sto"));
-			String thisLine;
-			while ((thisLine = inFile.readLine()) != null) {
-				String[] nqitems = thisLine.split(";");
-				String[] nqsubitems = nqitems[0].split("=");
-				if (whichCriteria.equalsIgnoreCase(nqsubitems[0].trim())) {
-				value = Integer.valueOf(nqsubitems[1].trim());//maximum number of questions on the test
-				}
-			}
-			inFile.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		return value;
-
+	
+	public static String getInput() {
+		String input = "";
+		input = scanner.nextLine();
+		return input;
 	}
-	public static void writeResult(String takerInfo) {
-		BufferedWriter bw = null;
-		FileWriter fw = null;
-		
-	    try {
-			File file = new File(findPath() + "takers.sto");
-			// if file doesn't exists, then create it
-			if (!file.exists()) {
-				file.createNewFile();
-			}
-			fw = new FileWriter(file.getAbsoluteFile(), true);
-			bw = new BufferedWriter(fw);
-			bw.write(takerInfo);
-			bw.newLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (bw != null)
-					bw.close();
-				if (fw != null)
-					fw.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}
 
+	public static HashMap< String,Integer> initExam() {
+		DBConnect db = new DBConnect();
+		HashMap< String,Integer> settingvalues = db.getSettingValues();
+		return settingvalues;
+	}
+
+	public static ExamTaker doLogin() {
+		DBConnect db = new DBConnect();
+		ExamTaker returnvalues = new ExamTaker();
+		int foundUserName = 0;
+		int startuserid = -1;
+		while (foundUserName == 0) {
+		System.out.print("Please enter your username: ");
+		String username = getInput();
+		System.out.print("Please enter your password: ");
+		String password = getInput();
+		startuserid = db.checkLogin(username, password);
+		if (startuserid < 1) {
+			System.out.println("Login not found. Are you a new user? Enter Y to create account.");
+			String newUser = getInput();
+			if (newUser.equalsIgnoreCase("y")) {
+				startuserid = createUser();
+			}
+		} 
+		if (startuserid > 0) {
+			foundUserName = 1;
+		} 
+		}
+		returnvalues = db.getUserValues(startuserid);
+		return returnvalues;
+	}
+
+	public static int createUser() {
+		DBConnect db = new DBConnect();
+		int userid= -1;
+		
+		System.out.println("Please enter your username: ");
+		String username = getInput();
+		System.out.println("Please enter your password: ");
+		String password = getInput();
+		System.out.println("Please enter your last name: ");
+		String lastname = getInput();
+		System.out.println("Please enter your first name: ");
+		String firstname = getInput();
+		System.out.println("Please enter your email address: ");
+		String email = getInput();
+		userid = db.addUser(username, password, email, firstname, lastname);
+		return userid;
+	}
+
+	
+	public static void writeResult(ExamTaker takerInfo) {
+		DBConnect db = new DBConnect();
+		db.addExamHistory(takerInfo);
 	}
 	
 	
@@ -168,50 +175,24 @@ public class JavaExam
 
 	
 	public static List<QuestionWithAnswer> generateTest(int numberOfQuestions, int numberOfAnswers) throws NumberFormatException, IOException {  
-		int fileNumberOfQuestions = 0;//initialize counter for number of questions in the file
-		if (numberOfAnswers > 26) { //checks if more answers per question selected than letters in alphabet and sets to max letters if so
-			numberOfAnswers = 26;
-		}
-
+		DBConnect db = new DBConnect();
 	    List<ExamQuestion> questionlist = new ArrayList<ExamQuestion>();
 		List<ExamAnswer> answerlist = new ArrayList<ExamAnswer>();
 		List<QuestionWithAnswer> qalist = new ArrayList<QuestionWithAnswer>();
-	    String thisLine = null;
-
 
 	    //Import Questions
-		try {
-            BufferedReader inFile = new BufferedReader(new FileReader(findPath() + "questions.sto"));
-			while ((thisLine = inFile.readLine()) != null) {
-				String[] items = thisLine.split("-:;,-");
-				questionlist.add(new ExamQuestion(Integer.valueOf(items[0]),items[1],items[2],Integer.valueOf(items[3])));
-				fileNumberOfQuestions++;
-			}
-			
-			if (numberOfQuestions > fileNumberOfQuestions) {
-				numberOfQuestions = fileNumberOfQuestions;
-			}
-			inFile.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+	    questionlist = db.getQuestionList();
+		if (numberOfQuestions > questionlist.size()) {
+			numberOfQuestions = questionlist.size();
 		}
 
 		//Import Answers
-		try {
-            BufferedReader inFile = new BufferedReader(new FileReader(findPath() + "answers.sto"));
-			while ((thisLine = inFile.readLine()) != null) {
-				String[] items = thisLine.split("-:;,-");
-				answerlist.add(new ExamAnswer(Integer.valueOf(items[0]),Integer.valueOf(items[1]),items[2],Boolean.valueOf(items[3])));
-			}
-			inFile.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-
+	    answerlist = db.getAnswerList();
 	    List<ExamQuestion> copy = new LinkedList<ExamQuestion>(questionlist);
 	    Collections.shuffle(copy);
 	    List<ExamQuestion> randQuestions = copy.subList(0, numberOfQuestions);//randomize questions and set to number selected by numberOfQuestions
-		//Combine Questions and Answers		
+		
+	    //Combine Questions and Answers		
 	    for(ExamQuestion r:randQuestions){  
 			List<ExamAnswer> sortedAnswerList = sortedAnswers(numberOfAnswers, r.id, answerlist);
 		    qalist.add(new QuestionWithAnswer(r.question,sortedAnswerList));
@@ -239,7 +220,7 @@ public class JavaExam
     	return sortedAnswers;
     }
 
-    
+   
  }
 
 
