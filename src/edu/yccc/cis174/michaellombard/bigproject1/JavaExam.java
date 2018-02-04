@@ -2,10 +2,7 @@ package edu.yccc.cis174.michaellombard.bigproject1;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.HashMap;
@@ -16,11 +13,10 @@ public class JavaExam
 {
 	private static Scanner scanner = new Scanner(System.in);//initialize input detection
 
-
 	public static void main(String[] args) throws NumberFormatException, IOException 
 	{  
 		//TESTING VARIABLE INITIALIZATION START\\
-		HashMap< String,Integer> initvalues = initExam();
+		HashMap< String,Integer> initvalues = ExamFunction.initExam();
 		int numberOfQuestions = initvalues.get("numberOfQuestions");//maximum number of questions on the test
 		int numberOfAnswers = initvalues.get("numberOfAnswers");//maximum number of answers per question
 		int passFailCutoff = initvalues.get("passFailCutoff");//Happy result/unhappy result changeover point
@@ -28,7 +24,7 @@ public class JavaExam
 		//TESTING VARIABLE INITIALIZATION END\\
 		
 		//GENERATE EXAM START\\
-		List<QuestionWithAnswer> qalist = generateTest(numberOfQuestions,numberOfAnswers);	//Generate this exam
+		List<QuestionWithAnswer> qalist = ExamFunction.generateTest(numberOfQuestions,numberOfAnswers);	//Generate this exam
 		//GENERATE EXAM END\\
 
 		//GET EXAM TAKER DATA START\\
@@ -86,7 +82,7 @@ public class JavaExam
 		userValues.setAttemptTimeStamp(timeStamp);
 		userValues.setAttemptScore(examScore);
 		userValues.setAttemptDuration(toIntExact(seconds));
-    	writeResult(userValues);
+		ExamFunction.writeResult(userValues);
 		if (passFailCutoff <= examScore) {
 			System.out.println("Congratulations " + userValues.getFirstName() + " " + userValues.getLastName() + "! You scored a " + examScore + "!");
 		} else {
@@ -99,12 +95,6 @@ public class JavaExam
 		String input = "";
 		input = scanner.nextLine();
 		return input;
-	}
-
-	public static HashMap< String,Integer> initExam() {
-		DBConnect db = new DBConnect();
-		HashMap< String,Integer> settingvalues = db.getSettingValues();
-		return settingvalues;
 	}
 
 	public static ExamTaker doLogin() {
@@ -150,77 +140,7 @@ public class JavaExam
 		userid = db.addUser(username, password, email, firstname, lastname);
 		return userid;
 	}
-
 	
-	public static void writeResult(ExamTaker takerInfo) {
-		DBConnect db = new DBConnect();
-		db.addExamHistory(takerInfo);
-	}
-	
-	
-	public static String findPath() {
-	    //MAKE PATH AS DYNAMIC AS POSSIBLE START\\
-	    String pathToClass = JavaExam.class.getName();
-	    pathToClass = pathToClass.replace(".", ",");
-	    String[] pathItems = pathToClass.split(",");
-	    String pathToClassDir = "";
-	    for (int i = 0; i < (pathItems.length - 1); i++) {//split string to remove class name and leave path data
-	    	pathToClassDir = pathToClassDir + pathItems[i] + "\\\\";
-	    }
-	    String pathToFile = System.getProperty("user.dir").replace("\\","\\\\") + "\\\\src\\\\" + pathToClassDir;
-		//MAKE PATH AS DYNAMIC AS POSSIBLE END\\
-	    return pathToFile;
-		
-	}
-
-	
-	public static List<QuestionWithAnswer> generateTest(int numberOfQuestions, int numberOfAnswers) throws NumberFormatException, IOException {  
-		DBConnect db = new DBConnect();
-	    List<ExamQuestion> questionlist = new ArrayList<ExamQuestion>();
-		List<ExamAnswer> answerlist = new ArrayList<ExamAnswer>();
-		List<QuestionWithAnswer> qalist = new ArrayList<QuestionWithAnswer>();
-
-	    //Import Questions
-	    questionlist = db.getQuestionList();
-		if (numberOfQuestions > questionlist.size()) {
-			numberOfQuestions = questionlist.size();
-		}
-
-		//Import Answers
-	    answerlist = db.getAnswerList();
-	    List<ExamQuestion> copy = new LinkedList<ExamQuestion>(questionlist);
-	    Collections.shuffle(copy);
-	    List<ExamQuestion> randQuestions = copy.subList(0, numberOfQuestions);//randomize questions and set to number selected by numberOfQuestions
-		
-	    //Combine Questions and Answers		
-	    for(ExamQuestion r:randQuestions){  
-			List<ExamAnswer> sortedAnswerList = sortedAnswers(numberOfAnswers, r.id, answerlist);
-		    qalist.add(new QuestionWithAnswer(r.question,sortedAnswerList));
-		}
-
-	    return qalist;
-	}  
-
-
-    public static List<ExamAnswer> sortedAnswers(int listLength, int questionId, List<ExamAnswer> listToSort) {//Sorts and shuffles exam answers
-	    List<ExamAnswer> copy = new LinkedList<ExamAnswer>(listToSort);//Make copy of original list to work with
-	    List<ExamAnswer> copyb = new ArrayList<ExamAnswer>();
-		int numAnswers = 0;
-	    Collections.shuffle(copy);//randomizes list
-	    for(ExamAnswer a:copy){ //pulls answers for current question into new list
-			if (questionId == a.questionId) {
-			copyb.add(new ExamAnswer(a.id,a.questionId,a.answer,a.isCorrect));		
-			numAnswers++;
-			}
-			}
-	    if (listLength > numAnswers) {listLength = numAnswers;}//ensures no calculation errors if not enough answers present for question
-	    Collections.sort(copyb, ExamAnswer.ExamIsCorrect);//ensures correct answer is always in the list
-	    List<ExamAnswer> sortedAnswers = copyb.subList(0, listLength);//Makes sure correct number of possible answers selected
-	    Collections.shuffle(sortedAnswers);//shuffle again to make sure correct answer is not always first answer
-    	return sortedAnswers;
-    }
-
-   
  }
 
 
