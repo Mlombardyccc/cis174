@@ -1,6 +1,5 @@
 package edu.yccc.cis174.michaellombard.bigproject1;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -11,9 +10,9 @@ import java.util.HashMap;
 public class ExamFunction 
 {
 
-	public static HashMap< String,Integer> initExam() {
+	public static HashMap< String,String> initExam() { 
 		DBConnect db = new DBConnect();
-		HashMap< String,Integer> settingvalues = db.getSettingValues();
+		HashMap< String,String> settingvalues = db.getSettingValues();
 		return settingvalues;
 	}
 
@@ -22,7 +21,7 @@ public class ExamFunction
 		db.addExamHistory(takerInfo);
 	}
 	
-	public static List<QuestionWithAnswer> generateTest(int numberOfQuestions, int numberOfAnswers) throws NumberFormatException, IOException {  
+	public static List<QuestionWithAnswer> generateTest(int numberOfQuestions, int numberOfAnswers) {  
 		DBConnect db = new DBConnect();
 	    List<ExamQuestion> questionlist = new ArrayList<ExamQuestion>();
 		List<ExamAnswer> answerlist = new ArrayList<ExamAnswer>();

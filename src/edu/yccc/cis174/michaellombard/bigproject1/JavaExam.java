@@ -16,11 +16,11 @@ public class JavaExam
 	public static void main(String[] args) throws NumberFormatException, IOException 
 	{  
 		//TESTING VARIABLE INITIALIZATION START\\
-		HashMap< String,Integer> initvalues = ExamFunction.initExam();
-		int numberOfQuestions = initvalues.get("numberOfQuestions");//maximum number of questions on the test
-		int numberOfAnswers = initvalues.get("numberOfAnswers");//maximum number of answers per question
-		int passFailCutoff = initvalues.get("passFailCutoff");//Happy result/unhappy result changeover point
-		int answerType = initvalues.get("answerType");//Type of question numbers or letters
+		HashMap< String,String> initvalues = ExamFunction.initExam();
+		int numberOfQuestions = Integer.getInteger(initvalues.get("numberOfQuestions"));//maximum number of questions on the test
+		int numberOfAnswers = Integer.getInteger(initvalues.get("numberOfAnswers"));//maximum number of answers per question
+		int passFailCutoff = Integer.getInteger(initvalues.get("passFailCutoff"));//Happy result/unhappy result changeover point
+		int answerType = Integer.getInteger(initvalues.get("answerType"));//Type of question numbers or letters
 		//TESTING VARIABLE INITIALIZATION END\\
 		
 		//GENERATE EXAM START\\
