@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.*;
-import net.miginfocom.swing.MigLayout;
 
 
 public class JExamUI {
