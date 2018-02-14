@@ -148,8 +148,7 @@ public class JExamUI {
 						if(grade){
 							gradeExam();
 							if (db.storeExam(qalist, selectedAnswer, et, examName)) {
-							recordResults();
-							showResults();
+								showResults();
 							} else {
 								showResults("Error");
 							}
@@ -249,16 +248,16 @@ public class JExamUI {
 
 	}
 
-	private void recordResults() {
-
-	}
-
 	private void showResults() {
-
+		showResults("");
 	}
 	
 	private void showResults(String code) {
-
+		if (code.equalsIgnoreCase("error")) {
+			
+		} else {
+			
+		}
 	}
 
 
