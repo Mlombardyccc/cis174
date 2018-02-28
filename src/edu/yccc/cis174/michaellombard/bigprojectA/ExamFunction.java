@@ -10,6 +10,23 @@ import java.util.HashMap;
 public class ExamFunction 
 {
 
+
+	public static String findPath() {
+	    //MAKE PATH AS DYNAMIC AS POSSIBLE START\\
+	    String pathToClass = DBConnect.class.getName();
+	    pathToClass = pathToClass.replace(".", ",");
+	    String[] pathItems = pathToClass.split(",");
+	    String pathToClassDir = "";
+	    for (int i = 0; i < (pathItems.length - 1); i++) {//split string to remove class name and leave path data
+	    	pathToClassDir = pathToClassDir + pathItems[i] + "\\\\";
+	    }
+	    String pathToFile = System.getProperty("user.dir").replace("\\","\\\\") + "\\\\src\\\\" + pathToClassDir;
+		//MAKE PATH AS DYNAMIC AS POSSIBLE END\\
+	    return pathToFile;
+		
+	}
+
+	
 	public static HashMap< String,String> initExam() { 
 		DBConnect db = new DBConnect();
 		HashMap< String,String> settingvalues = db.getSettingValues();

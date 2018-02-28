@@ -6,6 +6,16 @@ public class AvailableExam {
 	int numberofquestions;
 	int maxanswers;
 	int allowedattempts;
+	int remainingattempts;
+	
+	public int getRemainingattempts() {
+		return remainingattempts;
+	}
+
+	public void setRemainingattempts(int remainingattempts) {
+		this.remainingattempts = remainingattempts;
+	}
+
 	int timelimit;
 	
 	
@@ -57,13 +67,14 @@ public class AvailableExam {
 		this.timelimit = timelimit;
 	}
 
-	public AvailableExam(int id, String examname,int numberofquestions, int maxanswers, int allowedattempts, int timelimit) {
+	public AvailableExam(int id, String examname,int numberofquestions, int maxanswers, int allowedattempts, int remainingattempts, int timelimit) {
 		this.id = id;
 		this.examname = examname;
 		this.numberofquestions = numberofquestions;
 		this.maxanswers = maxanswers;
-		this.allowedattempts = timelimit;
-		this.maxanswers = timelimit;
+		this.allowedattempts = allowedattempts;
+		this.remainingattempts = remainingattempts;
+		this.timelimit = timelimit;
 	}
 
 	public AvailableExam() {
@@ -71,7 +82,7 @@ public class AvailableExam {
 	}
 
 	public String toString() {
-		String thisString = "ID: " + id + " |Exam Name: " + examname + " |Number of Questions: " + numberofquestions + " |Max Answers: " + maxanswers + " |Allowed Attempts: " + allowedattempts + " |Time Limit: " + timelimit;
+		String thisString = "ID: " + id + " |Exam Name: " + examname + " |Number of Questions: " + numberofquestions + " |Max Answers: " + maxanswers + " |Allowed Attempts: " + allowedattempts + " |Remaining Attempts: " + remainingattempts + " |Time Limit: " + timelimit;
 		return thisString;
 	}
 	

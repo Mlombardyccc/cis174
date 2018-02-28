@@ -25,25 +25,11 @@ public class DBConnect {
 		conn.close();
 	}
 	
-	public static String findPath() {
-	    //MAKE PATH AS DYNAMIC AS POSSIBLE START\\
-	    String pathToClass = DBConnect.class.getName();
-	    pathToClass = pathToClass.replace(".", ",");
-	    String[] pathItems = pathToClass.split(",");
-	    String pathToClassDir = "";
-	    for (int i = 0; i < (pathItems.length - 1); i++) {//split string to remove class name and leave path data
-	    	pathToClassDir = pathToClassDir + pathItems[i] + "\\\\";
-	    }
-	    String pathToFile = System.getProperty("user.dir").replace("\\","\\\\") + "\\\\src\\\\" + pathToClassDir;
-		//MAKE PATH AS DYNAMIC AS POSSIBLE END\\
-	    return pathToFile;
-		
-	}
 
 	//*****  Connect to the database and return the Connection object *****\\
 	private static Connection connect() {
 		// SQLite connection string
-		String basepath = findPath();
+		String basepath = ExamFunction.findPath();
 		String url = "jdbc:sqlite:" + basepath + "exam.db";
 		System.out.println("Accessing Database...");//Testing code to verify database access, Remove for production
 		Connection conn = null;
@@ -324,7 +310,7 @@ public class DBConnect {
 	}
 	
 	private int addExamStore(int users_id, int examid, String startTime, int duration, int score) {
-		String sql = "INSERT INTO examstore(users_id, examname, starttime, duration, score, active) VALUES(?,?,?,?,?,?)";
+		String sql = "INSERT INTO examstore(users_id, preparedexams_id, starttime, duration, score, active) VALUES(?,?,?,?,?,?)";
 		int last_inserted_id = -1;
 		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			pstmt.setInt(1, users_id);
@@ -346,13 +332,14 @@ public class DBConnect {
 	
 	public List<AvailableExam> getExamsAvailable(int userid) {
 		List<AvailableExam> value = new ArrayList<AvailableExam>();
-		String sql = "SELECT preparedexams.*  FROM preparedexams LEFT JOIN preparedexams_users ON preparedexams.id = preparedexams_users.preparedexams_id WHERE preparedexams_users.remainingattempts > 0 AND preparedexams_users.active = 1 AND preparedexams_users.users_id = " + userid;
+		String sql = "SELECT preparedexams.*, preparedexams_users.remainingattempts  FROM preparedexams LEFT JOIN preparedexams_users ON preparedexams.id = preparedexams_users.preparedexams_id WHERE preparedexams_users.remainingattempts > 0 AND preparedexams_users.active = 1 AND preparedexams_users.users_id = " + userid;
 		try (
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql)){
 			// loop through the result set
 		while (rs.next()) {
-				value.add(new AvailableExam(rs.getInt("preparedexams.id"), rs.getString("examname"), rs.getInt("preparedexams.numberofquestions"), rs.getInt("preparedexams.maxanswers"), rs.getInt("preparedexams.allowedattempts"), rs.getInt("preparedexams.timelimit")));
+			
+				value.add(new AvailableExam(rs.getInt("id"), rs.getString("examname"), rs.getInt("numberofquestions"), rs.getInt("maxanswers"), rs.getInt("allowedattempts"),rs.getInt("remainingattempts"), rs.getInt("timelimit")));
 			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
@@ -361,15 +348,15 @@ public class DBConnect {
 		
 	}
 
-	public HashMap< String,String> getExamsTaken() {
-		HashMap< String,String> value = new HashMap< String,String>();
-		String sql = "SELECT * FROM examsettings";
+	public List<CompletedExam> getExamsTaken(int userid) {
+		List<CompletedExam> value = new ArrayList<CompletedExam>();
+		String sql = "SELECT examstore.*, preparedexams.examname AS examname, preparedexams.numberofquestions AS numquestions FROM examstore LEFT JOIN preparedexams ON examstore.preparedexams_id = preparedexams.id WHERE examstore.active = 1 AND examstore.users_id = " + userid;
 		try (
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql)){
 			// loop through the result set
 		while (rs.next()) {
-				value.put(rs.getString("name"), rs.getString("value"));
+				value.add(new CompletedExam(rs.getInt("id"), rs.getInt("preparedexams_id"), rs.getString("examname"), rs.getString("starttime"), rs.getInt("duration"), rs.getInt("score"), rs.getInt("numquestions")));
 			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());

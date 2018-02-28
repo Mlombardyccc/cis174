@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.*;
+import javax.swing.ImageIcon;
 import net.miginfocom.swing.MigLayout;
 
 
@@ -28,14 +29,20 @@ public class JExamUI {
 	static int examScore;
 	static int numberCorrect = 0;
 	JPanel cards = new JPanel(new CardLayout());
-	JScrollPane scrollPaneAvailExams = new JScrollPane();
+	JPanel sPaneAvailExams = new JPanel(new MigLayout("", "[grow]", "[][]"));
+	JPanel sPaneCompExams = new JPanel(new MigLayout("", "[grow]", "[][]"));
+	JButton btnStart;
+	JPanel examChoicePanel;
+	JPanel waitPanel;
+	JPanel gradingPanel;
+
 	//TESTING VARIABLE INITIALIZATION START\\
 	static HashMap< String,String> initvalues = ExamFunction.initExam();
-	int numberOfQuestions = Integer.parseInt(initvalues.get("numberOfQuestions"));//maximum number of questions on the test
-	int numberOfAnswers = Integer.parseInt(initvalues.get("numberOfAnswers"));//maximum number of answers per question
+	int numberOfQuestions;//maximum number of questions on the test
+	int numberOfAnswers;//maximum number of answers per question
 	int passFailCutoff = Integer.parseInt(initvalues.get("passFailCutoff"));//Happy result/unhappy result changeover point
 	int answerType = Integer.parseInt(initvalues.get("answerType"));//Type of question numbers or letters
-	int examID = 1; //Integer.parseInt(initvalues.get("name"));//Type of question numbers or letters
+	int examID; //Integer.parseInt(initvalues.get("name"));//Type of question numbers or letters
 	//TESTING VARIABLE INITIALIZATION END\\
 
 	/**
@@ -73,7 +80,7 @@ public class JExamUI {
 		final JButton btnLogin = new JButton("Login");
 		final JButton btnScore = new JButton("Score Exam");
 		final JButton btnLogout = new JButton("Logout");
-		final JButton btnStart = new JButton("Start Exam");
+		btnStart = new JButton("Start Exam");
 		
 		JLabel lblWelcomeToThe = new JLabel("Welcome to the Java Exam Maker, Please Login.");
 		JLabel lblLoggedIn = new JLabel("");
@@ -95,13 +102,24 @@ public class JExamUI {
 		cards.setBounds(0, 0, 660, 367);
 		cards.setLocation(0, 0);
 
-		JPanel waitPanel = new JPanel();
-		waitPanel.setLayout(new BorderLayout(0, 0));
+		waitPanel = new JPanel();
 		waitPanel.setBounds(0, 0, 670, 367);
-		waitPanel.add(btnStart);
+		waitPanel.setLayout(new MigLayout("", "[][grow][]", "[][grow][]"));
+		waitPanel.add(btnStart, "cell 0 0 3 3,alignx center,aligny center, grow");
 		mid_panel.add(waitPanel);
 
 		mid_panel.add(cards);
+		gradingPanel = new JPanel();
+		gradingPanel.setLayout(new BorderLayout(0, 0));
+		gradingPanel.setBounds(0, 0, 670, 367);
+		JLabel lblGradingText = new JLabel("Grading Exam");
+		ImageIcon icon = new ImageIcon(ExamFunction.findPath() + "true.gif");
+		JLabel thumb = new JLabel();
+		thumb.setIcon(icon);
+		gradingPanel.add(lblGradingText);
+		gradingPanel.add(thumb);
+		mid_panel.add(gradingPanel);
+		gradingPanel.setVisible(false);
 		
 		JPanel gradePanel = new JPanel();
 		gradePanel.setLayout(new BorderLayout(0, 0));
@@ -116,10 +134,12 @@ public class JExamUI {
 		btnContinue.setHorizontalAlignment(SwingConstants.CENTER);
 		gradePanel.add(btnContinue);
 		
-		JPanel examChoicePanel = new JPanel();
+		examChoicePanel = new JPanel();
 		examChoicePanel.setBounds(0, 0, 670, 367);
 		mid_panel.add(examChoicePanel);
 		examChoicePanel.setLayout(new MigLayout("", "[grow][grow]", "[20px][grow]"));
+		JScrollPane scrollPaneAvailExams = new JScrollPane(sPaneAvailExams);
+		JScrollPane scrollPaneCompExams = new JScrollPane(sPaneCompExams);
 		
 		examChoicePanel.add(scrollPaneAvailExams, "cell 0 1,alignx left,grow");
 		
@@ -129,18 +149,14 @@ public class JExamUI {
 		JLabel lblCompletedExams = new JLabel("Completed Exams");
 		examChoicePanel.add(lblCompletedExams, "cell 1 0,alignx center");
 
-		JScrollPane scrollPaneCompExams = new JScrollPane();
-		examChoicePanel.add(scrollPaneCompExams, "cell 1 1,alignx left,grow");
 
-		JButton btnExamsTaken = new JButton("examstaken");
-		scrollPaneCompExams.add(btnExamsTaken);
+		examChoicePanel.add(scrollPaneCompExams, "cell 1 1,alignx left,grow");
 
 
 		
 		cards.setVisible(false);
 		gradePanel.setVisible(false);
 		examChoicePanel.setVisible(true);
-
 
 		buildExam();
 
@@ -182,7 +198,11 @@ public class JExamUI {
 							grade = true;
 						}
 						if(grade){
+							cards.setVisible(false);
+							gradingPanel.setVisible(true);
 							gradeExam();
+							gradingPanel.setVisible(false);
+
 							if (db.storeExam(qalist, selectedAnswer, et, examID)) {
 								showResults();
 							} else {
@@ -202,11 +222,13 @@ public class JExamUI {
 							et = loginDlg.getExamTaker();
 							btnLogin.setVisible(false);
 							btnLogout.setVisible(true);
+							waitPanel.setVisible(false);
 							examChoicePanel.setVisible(true);
 							lblLoggedIn.setText(et.getFirstName() + " " + et.getLastName());
 							lblLoggedIn.setVisible(true);
 							lblWelcomeToThe.setText("Welcome to the Java Exam Maker.");
 							buildExamsAvailable();
+							buildExamsTaken();
 
 
 						}
@@ -247,12 +269,15 @@ public class JExamUI {
 						lblElapsedTime.setText("");
 						lblElapsedTime.setVisible(false);
 						btnScore.setVisible(false);
+						sPaneCompExams.removeAll();
+						sPaneAvailExams.removeAll();
 					}
 				});
 
 	}
 
 	private void gradeExam() {
+		
 		for(ButtonGroup bg:answerGroup) {
 			if (bg.getSelection() != null) {
 				ButtonModel buttonModel = bg.getSelection();
@@ -281,6 +306,7 @@ public class JExamUI {
 		et.attemptScore = examScore;
 		et.attemptDuration = 0;
 //		System.out.println(Integer.toString(examScore));
+		cards.removeAll();
 		
 
 	}
@@ -337,7 +363,7 @@ public class JExamUI {
 			JScrollPane scrollPaneq = new JScrollPane();
 			scrollPaneq.setBounds(0, 0, 670, 265);
 			scrollPaneq.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-			q1panel.add(scrollPaneq, "cell 0 3 3 1,grow");
+			q1panel.add(scrollPaneq, "cell 0 3 3 1, grow,push");
 			JPanel paneQJ = new JPanel();
 			paneQJ.setLayout(new MigLayout("", "[75px][grow][75px]", "[][][][][][][][][]"));
 
@@ -391,15 +417,51 @@ public class JExamUI {
 
 		}
 	}
+	
+	private void setExam(AvailableExam ae) {
+		numberOfQuestions = ae.getNumberofquestions();//maximum number of questions on the test
+		numberOfAnswers = ae.getMaxanswers();//maximum number of answers per question
+		examID =  ae.getId(); //Integer.parseInt(initvalues.get("name"));//Type of question numbers or letters
+		buildExam();
+		waitPanel.setVisible(true);
+		btnStart.setVisible(true);
+		examChoicePanel.setVisible(false);
+		sPaneCompExams.removeAll();
+		sPaneAvailExams.removeAll();
+	}
 
 	private void buildExamsAvailable() {
-		List<AvailableExam> availableexams = db.getExamsAvailable(et.id);
-		for (AvailableExam ae:availableexams) {
-		scrollPaneAvailExams.add(new JButton(ae.examname));
+		List<AvailableExam> availableExams = db.getExamsAvailable(et.id);
+		int x = 0;
+		for (AvailableExam ae:availableExams) {
+			System.out.println(ae.toString());
+			JButton aebutton = new JButton(ae.examname);
+			aebutton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					setExam(ae);
+				}
+			});
+			sPaneAvailExams.add(aebutton, "cell 0 " + x + " ,growx");
+			x++;
 		}
+		if (x == 0) {
+			sPaneAvailExams.add(new JLabel("No exams available at this time."), "cell 0 0 ,growx");
+		}
+		sPaneAvailExams.validate();
 	}
 	
 	private void buildExamsTaken() {
+		List<CompletedExam> completedExams = db.getExamsTaken(et.id);
+		int x = 0;
+		for (CompletedExam ce:completedExams) {
+			System.out.println(ce.toString());
+		sPaneCompExams.add(new JButton(ce.getExamName()), "cell 0 " + x + " ,growx");
+		x++;
+		}
+		if (x == 0) {
+			sPaneCompExams.add(new JLabel("No exams available at this time."), "cell 0 0 ,growx");
+		}
+		sPaneCompExams.validate();
 	}
 	
 	
