@@ -13,7 +13,7 @@ public class Exam {
 	public static void main(String[] args) {  
 
 		DBConnect udb = new DBConnect();
-		int qCount = 0;
+		int qCount = 0;//initiallize question total counter
 		
 		//TESTING VARIABLE INITIALIZATION START\\
 		int numberOfQuestions = 10;//maximum number of questions on the test
