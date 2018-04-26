@@ -82,7 +82,7 @@ public class Slack {
 		frmMessageApp.getContentPane().add(lblMessageTarget);
 
 		//Buttons to Select channel\\
-		
+		 
 		//Message Instructor --- U795A112Q
 		JRadioButton rdbtnMessageInstructor = new JRadioButton("Message Instructor");
 		rdbtnMessageInstructor.setActionCommand("U795A112Q");
