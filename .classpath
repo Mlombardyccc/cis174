@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Users/smichaellombard/Downloads/sqlite-jdbc-3.21.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/mlomb/Downloads/sqlite-jdbc-3.21.0.jar"/>
 	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
 	<classpathentry kind="lib" path="C:/Users/mlomb/.m2/repository/org/springframework/spring-context/5.0.4.RELEASE/spring-context-5.0.4.RELEASE.jar">
 		<attributes>
