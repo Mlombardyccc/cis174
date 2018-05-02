@@ -1,5 +1,14 @@
 package edu.yccc.cis174.michaellombard.project2final;
 
+/*****************************
+OBJECTIVES - FINAL - MICHAEL LOMBARD
+
+1. Develop Abstract Class version of Exam Builder
+2. Provide GUI instead of console interface
+3. Make fully database driven
+4. 
+5. Provide tool to view exam history
+*****************************/
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -34,6 +43,7 @@ public class ExamUI {
 	JButton button = new JButton("<<<");
 	JButton btnScoreExam = new JButton("Score Exam");
 	JButton btnLogin = new JButton("Login");
+	JButton btnLogout = new JButton("Logout");
 	JButton button_1 = new JButton(">>>");
 	JLabel lblQofX = new JLabel("Question Q of X");
 	JPanel panel_1 = new JPanel();
@@ -82,7 +92,6 @@ public class ExamUI {
 	public ExamUI() {
 		initialize();
 		doLogin();
-		startExam();
 	}
 
 	/**
@@ -155,9 +164,21 @@ public class ExamUI {
 						// if logged on successfully
 						if(loginDlg.isSucceeded()){
 							et = loginDlg.getExamTaker();
+							thisQuestion = 0;
+							qCount = 0;
+							startExam();
 							btnLogin.setVisible(false);
 							doShowMain(true);
 						}
+					}
+				});
+
+		btnLogout.addActionListener(
+				new ActionListener(){
+					public void actionPerformed(ActionEvent e) {
+						doShowMain(false);
+						btnLogout.setVisible(false);
+						btnLogin.setVisible(true);
 					}
 				});
 
@@ -199,6 +220,10 @@ public class ExamUI {
 		panel_1.add(btnLogin, "cell 1 6,alignx center");
 		btnLogin.setVisible(true);
 
+		btnLogout.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		panel_1.add(btnLogout, "cell 1 6,alignx center");
+		btnLogout.setVisible(false);
+
 		btnScoreExam.setFont(new Font("Times New Roman", Font.PLAIN, 14));
 		panel_1.add(btnScoreExam, "cell 1 6,alignx center");
 		btnScoreExam.setVisible(false);
@@ -217,13 +242,10 @@ public class ExamUI {
 	private void startExam() {
 
 		
-		String lastname = "Test";
-		String firstname = "User";
-		String examName = "New Exam Here";
+		String examName = "Basic Exam";
 
-		et.setLastName(lastname);
-		et.setFirstName(firstname);
-		
+		button_1.setEnabled(true);
+
 		
 		//TESTING VARIABLE INITIALIZATION START\\
 
@@ -231,6 +253,7 @@ public class ExamUI {
 		
 		//GENERATE EXAM START\\
 		lblTestName.setText(examName);
+		
 		qbm.createQASet(1,numberOfQuestions,numberOfAnswers);	//Generate mc exam
 		qbtf.createQASet(2,numberOfQuestions,numberOfAnswers);	//Generate tf exam
 		qbfb.createQASet(3,numberOfQuestions,numberOfAnswers);	//Generate tf exam
@@ -385,12 +408,14 @@ public class ExamUI {
 		button_1.setVisible(false);
 		btnScoreExam.setVisible(false);
 		answerField.setVisible(false);
+    	lblQofX.setVisible(false);
 
 		if (passFailCutoff <= et.getAttemptScore()) {
 			lblQuestion.setText("Congratulations " + et.getFirstName() + " " + et.getLastName() + "! You scored a " + et.getAttemptScore() + "!");
 		} else {
 			lblQuestion.setText("Sorry " + et.getFirstName() + " " + et.getLastName() + ". You scored a " + et.getAttemptScore() + ". Better luck next time.");
 		}
+		btnLogout.setVisible(true);
 		//RECORD AND DISPLAY EXAM RESULT END\\
 	}  
 }

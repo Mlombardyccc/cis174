@@ -13,7 +13,10 @@ public class QBFillBlank extends QuestionBlock {
 
 		List<QuestionWithAnswer> qaset = new ArrayList<QuestionWithAnswer>();	
 		List<ExamAnswer> sortedAnswers;
-		HashMap< Integer,String> qList = db.getQuestions(categoryID);//Call db to get a list of questions
+		HashMap< Integer,String> qList = new HashMap<Integer, String>();
+		qList.clear();
+		qList = db.getQuestions(categoryID);//Call db to get a list of questions
+		qaset.clear();
 
 		for (Map.Entry< Integer,String> entry : qList.entrySet()) { //go through each question returned by db
 			String answerList = "";

@@ -12,8 +12,11 @@ public class QBTrueFalse extends QuestionBlock {
 	public void createQASet(int categoryID, int minq, int maxq, int mina, int maxa, int randomizeq, int randomizea) {
 
 		List<ExamAnswer> sortedAnswers;
-		HashMap< Integer,String> qList = db.getQuestions(categoryID);//Call db to get a list of questions
+		HashMap< Integer,String> qList = new HashMap<Integer, String>();
+		qList.clear();
+		qList = db.getQuestions(categoryID);//Call db to get a list of questions
 		int maxamod = maxa;
+		qaset.clear();
 
 		for (Map.Entry< Integer,String> entry : qList.entrySet()) { //go through each question returned by db
 			String answerList = "";
