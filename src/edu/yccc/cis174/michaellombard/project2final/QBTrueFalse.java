@@ -17,6 +17,7 @@ public class QBTrueFalse extends QuestionBlock {
 		qList = db.getQuestions(categoryID);//Call db to get a list of questions
 		int maxamod = maxa;
 		qaset.clear();
+		questionCount = 0;
 
 		for (Map.Entry< Integer,String> entry : qList.entrySet()) { //go through each question returned by db
 			String answerList = "";

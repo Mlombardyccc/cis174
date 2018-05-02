@@ -17,6 +17,7 @@ public class QBFillBlank extends QuestionBlock {
 		qList.clear();
 		qList = db.getQuestions(categoryID);//Call db to get a list of questions
 		qaset.clear();
+		questionCount = 0;
 
 		for (Map.Entry< Integer,String> entry : qList.entrySet()) { //go through each question returned by db
 			String answerList = "";

@@ -6,7 +6,7 @@ OBJECTIVES - FINAL - MICHAEL LOMBARD
 1. Develop Abstract Class version of Exam Builder
 2. Provide GUI instead of console interface
 3. Make fully database driven
-4. 
+4. Use modal windows
 5. Provide tool to view exam history
 *****************************/
 import java.awt.EventQueue;
@@ -252,6 +252,11 @@ public class ExamUI {
 		//TESTING VARIABLE INITIALIZATION END\\
 		
 		//GENERATE EXAM START\\
+		qbmcount = 0;
+		qbtfcount = 0;
+		qbfbcount = 0;
+		qCount = 0; 
+
 		lblTestName.setText(examName);
 		
 		qbm.createQASet(1,numberOfQuestions,numberOfAnswers);	//Generate mc exam
