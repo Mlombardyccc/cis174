@@ -8,13 +8,8 @@ import java.util.Map;
 
 
 
-public class QBTrueFalse implements QuestionBlock {
+public class QBTrueFalse extends QuestionBlock {
 
-	boolean reorder;
-	List<String> wrongset = new ArrayList<String>();
-	DBConnect db = new DBConnect();	
-	/*******  START MUST BE IMPLEMENTED **********/
-	
 	public List<QuestionWithAnswer> createQASet(int categoryID, int minq, int maxq, int mina, int maxa, int randomizeq, int randomizea) {
 
 		List<QuestionWithAnswer> qaset = new ArrayList<QuestionWithAnswer>();	
@@ -54,14 +49,6 @@ public class QBTrueFalse implements QuestionBlock {
 
 	public List<QuestionWithAnswer> createQASet(int categoryID, int maxq, int maxa) { 
 		return createQASet(categoryID, 0, maxq, 1, maxa, 1, 1);
-	};
-	
-	public boolean inputCorrect(String userinput) {
-		if (userinput.equalsIgnoreCase("t") || userinput.equalsIgnoreCase("true") || userinput.equalsIgnoreCase("f") || userinput.equalsIgnoreCase("false")) {
-			return true;
-		} else {
-			return false;
-		}
 	};
 	
 	public boolean answerCorrect(String userinput, String correctAnswer) {

@@ -7,8 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 
-
-public class QBMultipleChoice extends QuestionBlock {
+public class QBFillBlank extends QuestionBlock {
 
 	public List<QuestionWithAnswer> createQASet(int categoryID, int minq, int maxq, int mina, int maxa, int randomizeq, int randomizea) {
 
@@ -22,28 +21,24 @@ public class QBMultipleChoice extends QuestionBlock {
 			List<ExamAnswer> aList = db.getAnswers(thiskey);//call db to get all answers for each question
 			if (aList.size() >= mina) {//determine if there are at least enough questions to reach the minimum number of answers required
 				String correctAns = "0";//default setting for correct answer
-				if (randomizea == 1) {//if answers are to be randomized
-					Collections.sort(aList, ExamAnswer.ExamIsCorrect);//ensures correct answer is always in the list
-					if ( aList.size() < maxa) {
-						maxa = aList.size();
-					}
-					sortedAnswers = aList.subList(0, maxa);//Makes sure correct number of possible answers selected
-					Collections.shuffle(sortedAnswers);//shuffle again to make sure correct answer is not always first answer
-				} else {//if answers are to be in db order
-					sortedAnswers = aList.subList(0, maxa);//Makes sure correct number of possible answers selected
-				}
+				sortedAnswers = aList;
 				for(int i = 0; i < sortedAnswers.size(); i++) {//create string representation of answers and get correct answer value
 					answerList += (i+1) +")" + sortedAnswers.get(i).answer + "\n";
 					if (sortedAnswers.get(i).isCorrect == 1) {//check if this answer is the correct answer
-						correctAns = "" + (i+1);
+						if (correctAns.equals("")) {
+							correctAns += "" + (i+1);
+						} else {
+							correctAns += "|*|" + (i+1);
+						}
 					}
 				}
 				qaset.add(new QuestionWithAnswer(entry.getValue(),answerList, correctAns));//add question with answer to set
 			}
-			if (randomizeq == 1) {//if question order to be randomized
-				Collections.shuffle(qaset);
-			}
 		}
+		if (randomizeq == 1) {//if question order to be randomized
+			Collections.shuffle(qaset);
+		}
+
 		return qaset;
 	};
 
@@ -51,12 +46,16 @@ public class QBMultipleChoice extends QuestionBlock {
 		return createQASet(categoryID, 0, maxq, 1, maxa, 1, 1);
 	};
 	
-	public boolean inputCorrect(String userinput) {
-		if (userinput.isEmpty()) {
-			return false;
-		} else {
-			return true;
+	public boolean answerCorrect(String userinput, String correctAnswer) {
+
+		boolean correct = false;
+		String array1[]= correctAnswer.split("|*|");
+		for (String temp: array1){
+			if (userinput.equals(temp)) {
+				correct = true;
+			}
 		}
+		return correct;
 	};
 	
 	/*******  END MUST BE IMPLEMENTED **********/
