@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +29,7 @@ public class DBConnect {
 	private static Connection connect() {
 		// SQLite connection string
 		String url = "jdbc:sqlite:exam.db";
-		System.out.println("Accessing Database...");//Testing code to verify database access, Remove for production
+//		System.out.println("Accessing Database...");//Testing code to verify database access, Remove for production
 		Connection conn = null;
 		try {
 			conn = DriverManager.getConnection(url);
@@ -90,9 +89,9 @@ public class DBConnect {
 		}	
 	}
 	
-/*	public int checkLogin(String username, String password) {
+	public int checkLogin(String username, String password) {
 		int isAuthorized = -1;
-		String sql = "SELECT * FROM users WHERE username = '" +  username + "' AND password = '" + password + "'";
+		String sql = "SELECT * FROM examusers WHERE uname = '" +  username + "' AND pword = '" + password + "'";
 		try (		Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql)){
 
@@ -108,17 +107,17 @@ public class DBConnect {
 	
 	public ExamTaker getUserValues(int id) {
 		ExamTaker result = new ExamTaker();
-		String sql = "SELECT * FROM users WHERE active = 1 AND id = " +  id;
+		String sql = "SELECT * FROM examusers WHERE active = 1 AND id = " +  id;
 		try (
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql)){
 			// loop through the result set
 			while (rs.next()) {
 				result.setId(rs.getInt("id"));
-				result.setUserName(rs.getString("username"));
+				result.setuName(rs.getString("uname"));
 				result.setEmail(rs.getString("email"));
-				result.setFirstName(rs.getString("firstname"));
-				result.setLastName(rs.getString("lastname"));
+				result.setFirstName(rs.getString("fname"));
+				result.setLastName(rs.getString("lname"));
 				}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
@@ -127,7 +126,7 @@ public class DBConnect {
 		return result;
 	}
 	
-	public int addUser(String username, String password, String email, String lastname, String firstname) {
+/*	public int addUser(String username, String password, String email, String lastname, String firstname) {
 		String sql = "INSERT INTO users(username, password, email, lastname, firstname, active) VALUES(?,?,?,?,?,?)";
 		int last_inserted_id = -1;
 		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {

@@ -12,6 +12,8 @@ import java.util.Map;
 
 import javax.swing.*;
 import javax.swing.ImageIcon;
+
+import edu.yccc.cis174.michaellombard.project2final.LoginDialog;
 import net.miginfocom.swing.MigLayout;
 
 

@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class QBFillBlank extends QuestionBlock {
 
-	public List<QuestionWithAnswer> createQASet(int categoryID, int minq, int maxq, int mina, int maxa, int randomizeq, int randomizea) {
+	public void createQASet(int categoryID, int minq, int maxq, int mina, int maxa, int randomizeq, int randomizea) {
 
 		List<QuestionWithAnswer> qaset = new ArrayList<QuestionWithAnswer>();	
 		List<ExamAnswer> sortedAnswers;
@@ -33,20 +33,24 @@ public class QBFillBlank extends QuestionBlock {
 					}
 				}
 				qaset.add(new QuestionWithAnswer(entry.getValue(),answerList, correctAns));//add question with answer to set
+				questionCount++;
 			}
 		}
 		if (randomizeq == 1) {//if question order to be randomized
 			Collections.shuffle(qaset);
 		}
 
-		return qaset;
+	
 	};
 
-	public List<QuestionWithAnswer> createQASet(int categoryID, int maxq, int maxa) { 
-		return createQASet(categoryID, 0, maxq, 1, maxa, 1, 1);
+	public void createQASet(int categoryID, int maxq, int maxa) { 
+		createQASet(categoryID, 0, maxq, 1, maxa, 1, 1);
 	};
 	
-	public boolean answerCorrect(String userinput, String correctAnswer) {
+	public boolean answerCorrect(String userinput) {
+		QuestionWithAnswer qa = new QuestionWithAnswer();
+		qa = qaset.get(currentQuestion);
+		String correctAnswer = qa.getCorrectAnswer();
 
 		boolean correct = false;
 		String array1[]= correctAnswer.split("|*|");
@@ -56,7 +60,55 @@ public class QBFillBlank extends QuestionBlock {
 			}
 		}
 		return correct;
-	};
+	}
+
+	public boolean answerCorrect(String userinput, int thisQuestion) {
+		QuestionWithAnswer qa = new QuestionWithAnswer();
+		qa = qaset.get(thisQuestion);
+		String correctAnswer = qa.getCorrectAnswer();
+
+		boolean correct = false;
+		String array1[]= correctAnswer.split("|*|");
+		for (String temp: array1){
+			if (userinput.equals(temp)) {
+				correct = true;
+			}
+		}
+		return correct;
+	}
+	
+	public String getCorrectAnswer() {
+		String correctAnswerList = "";
+		QuestionWithAnswer qa = new QuestionWithAnswer();
+		qa = qaset.get(currentQuestion);
+		String correctAnswer = qa.getCorrectAnswer();
+		String array1[]= correctAnswer.split("|*|");
+		for (String temp: array1){
+			if (correctAnswerList.equals("")) {
+				correctAnswerList = temp;
+			} else {
+				correctAnswerList += " OR " + temp;
+			}
+		}
+		return correctAnswerList;
+	}
+
+	public String getCorrectAnswer(int thisQuestion) {
+		String correctAnswerList = "";
+		QuestionWithAnswer qa = new QuestionWithAnswer();
+		qa = qaset.get(thisQuestion);
+		String correctAnswer = qa.getCorrectAnswer();
+		String array1[]= correctAnswer.split("|*|");
+		for (String temp: array1){
+			if (correctAnswerList.equals("")) {
+				correctAnswerList = temp;
+			} else {
+				correctAnswerList += " OR " + temp;
+			}
+		}
+		return correctAnswerList;
+	}
+
 	
 	/*******  END MUST BE IMPLEMENTED **********/
 	

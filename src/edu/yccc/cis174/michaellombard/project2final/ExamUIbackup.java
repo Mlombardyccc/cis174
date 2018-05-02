@@ -24,7 +24,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.SwingConstants;
 
-public class ExamUI {
+public class ExamUIbackup {
 //ui variables
 	private JFrame frmExamTaker;
 	private JTextField answerField;
@@ -33,10 +33,8 @@ public class ExamUI {
 	JLabel lblAnswer = new JLabel("Answer");
 	JButton button = new JButton("<<<");
 	JButton btnScoreExam = new JButton("Score Exam");
-	JButton btnLogin = new JButton("Login");
 	JButton button_1 = new JButton(">>>");
 	JLabel lblQofX = new JLabel("Question Q of X");
-	JPanel panel_1 = new JPanel();
 	
 	//test variables	
 	DBConnect udb = new DBConnect();
@@ -67,7 +65,7 @@ public class ExamUI {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					ExamUI window = new ExamUI();
+					ExamUIbackup window = new ExamUIbackup();
 					window.frmExamTaker.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -79,9 +77,8 @@ public class ExamUI {
 	/**
 	 * Create the application.
 	 */
-	public ExamUI() {
+	public ExamUIbackup() {
 		initialize();
-		doLogin();
 		startExam();
 	}
 
@@ -101,8 +98,7 @@ public class ExamUI {
 		JPanel panel = new JPanel();
 		panel.setBackground(new Color(245, 245, 245));
 		
-		
-
+		JPanel panel_1 = new JPanel();
 		GroupLayout groupLayout = new GroupLayout(frmExamTaker.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -122,16 +118,10 @@ public class ExamUI {
 					.addPreferredGap(ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE))
 		);
-		
-		
 		panel.setLayout(new MigLayout("", "[100px:n][grow][100px:n]", "[]"));
 		panel.add(lblQofX, "cell 1 0,alignx center");
 		lblQofX.setFont(new Font("Times New Roman", Font.PLAIN, 14));
 		lblQofX.setHorizontalAlignment(SwingConstants.CENTER);
-		
-		
-		
-		
 		panel_1.setLayout(new MigLayout("fill", "[][grow][]", "[][][][][][][]"));
 		
 		lblTestName.setFont(new Font("Times New Roman", Font.BOLD, 18));
@@ -146,22 +136,6 @@ public class ExamUI {
 		answerField = new JTextField();
 		panel_1.add(answerField, "flowx,cell 1 4,growx");
 		answerField.setColumns(10);
-		
-		btnLogin.addActionListener(
-				new ActionListener(){
-					public void actionPerformed(ActionEvent e) {
-						LoginDialog loginDlg = new LoginDialog(frmExamTaker);
-						loginDlg.setVisible(true);
-						// if logged on successfully
-						if(loginDlg.isSucceeded()){
-							et = loginDlg.getExamTaker();
-							btnLogin.setVisible(false);
-							doShowMain(true);
-						}
-					}
-				});
-
-		
 		
 		JLabel label = new JLabel("");
 		panel_1.add(label, "cell 1 4,grow");
@@ -195,9 +169,6 @@ public class ExamUI {
 		button.setFont(new Font("Times New Roman", Font.PLAIN, 14));
 		panel_1.add(button, "cell 0 6");
 		
-		btnLogin.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-		panel_1.add(btnLogin, "cell 1 6,alignx center");
-		btnLogin.setVisible(true);
 
 		btnScoreExam.setFont(new Font("Times New Roman", Font.PLAIN, 14));
 		panel_1.add(btnScoreExam, "cell 1 6,alignx center");
@@ -206,11 +177,6 @@ public class ExamUI {
 		button_1.setFont(new Font("Times New Roman", Font.PLAIN, 14));
 		panel_1.add(button_1, "cell 2 6");
 		frmExamTaker.getContentPane().setLayout(groupLayout);
-	}
-	
-	public void doLogin() {
-		doShowMain(false);
-
 	}
 
 
@@ -242,6 +208,7 @@ public class ExamUI {
 		//GENERATE EXAM END\\
 
 		//TIMER AND TIMESTAMP INITIALIZATION START\\
+		et.setAttemptTimeStamp(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 		startTime = System.currentTimeMillis();//Start timer
 		//TIMER AND TIMESTAMP INITIALIZATION END\\
 		
@@ -324,21 +291,6 @@ public class ExamUI {
 		lblQofX.setText("" + (thisQuestion + 1) + " of " + qCount);
 	}
 	
-	private void doShowMain(boolean show) {
-    	lblAnswer.setVisible(show);
-    	lblTestName.setVisible(show);
-    	lblQuestion.setVisible(show);
-    	lblQofX.setVisible(show);
-		button.setVisible(show);
-		button_1.setVisible(show);
-		btnScoreExam.setVisible(false);
-		answerField.setVisible(show);
-	}
-
-/*	private void doShowLogin(boolean show) {
-		btnLogin.setVisible(show);
-	}
-*/	
 	private void scoreExam() {
 		//TIMER FINISH START\\
 		long endTime = System.currentTimeMillis();//end timer
@@ -378,8 +330,7 @@ public class ExamUI {
 		//end compare answers
 		//RECORD AND DISPLAY EXAM RESULT START\\
 		et.setAttemptScore((int)Math.round((((double)rightAnswers)/qCount)*100));
-		et.setAttemptTimeStamp(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-		udb.saveExam(et);
+    	udb.saveExam(et);
     	lblAnswer.setText("");
 		button.setVisible(false);
 		button_1.setVisible(false);

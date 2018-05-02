@@ -1,4 +1,4 @@
-package edu.yccc.cis174.michaellombard.bigprojectA;
+package edu.yccc.cis174.michaellombard.project2final;
 
 import java.awt.*;
 import java.awt.event.*;

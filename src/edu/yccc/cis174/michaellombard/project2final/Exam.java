@@ -3,7 +3,6 @@ package edu.yccc.cis174.michaellombard.project2final;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Scanner;
 
  
@@ -25,8 +24,8 @@ public class Exam {
 		//GENERATE EXAM START\\
 		QBMultipleChoice qbm = new QBMultipleChoice();
 		QBTrueFalse qbtf = new QBTrueFalse();
-		List<QuestionWithAnswer> qalistmc = qbm.createQASet(1,numberOfQuestions,numberOfAnswers);	//Generate mc exam
-		List<QuestionWithAnswer> qalisttf = qbtf.createQASet(2,numberOfQuestions,numberOfAnswers);	//Generate tf exam
+		qbm.createQASet(1,numberOfQuestions,numberOfAnswers);	//Generate mc exam
+		qbtf.createQASet(2,numberOfQuestions,numberOfAnswers);	//Generate tf exam
 		//GENERATE EXAM END\\
 
 		//GET EXAM TAKER DATA START\\
@@ -49,23 +48,31 @@ public class Exam {
 		//TIMER AND TIMESTAMP INITIALIZATION END\\
 		
 		//EXAM QUESTIONS START\\
-		for(QuestionWithAnswer qa:qalistmc){  
-			qCount++;
-			System.out.println(qa.question + "\n\n" + qa.answer);//display question with possible answers
+		for(int i = 0; i < qbm.questionCount; i++){
+			QuestionWithAnswer thisQA = qbm.getQA();
+			if (i != 0) {
+				thisQA = qbm.getNextQA();
+			}
+			System.out.println(thisQA.getQuestion() + "\n\n" + thisQA.getAnswer());//display question with possible answers
 			String answer = "";
 			while (!qbm.inputCorrect(answer)) {//if answer is blank or more than 1 character, repeat request for answer
 				answer = scanner.nextLine();//await answer
 			}
-			if (qbm.answerCorrect(answer, qa.getCorrectAnswer())) {rightAnswers++;}
-		}  
-		for(QuestionWithAnswer qa:qalisttf){  
+			if (qbm.answerCorrect(answer)) {rightAnswers++;}
 			qCount++;
-			System.out.println(qa.question + "\n\n" + qa.answer);//display question with possible answers
+		}  
+		for(int i = 0; i < qbtf.questionCount; i++){  
+			QuestionWithAnswer thisQA = qbtf.getQA();
+			if (i != 0) {
+				thisQA = qbtf.getNextQA();
+			}
+			System.out.println(thisQA.getQuestion() + "\n\n" + thisQA.getAnswer());//display question with possible answers
 			String answer = "";
 			while (!qbtf.inputCorrect(answer)) {//if answer is blank or more than 1 character, repeat request for answer
 				answer = scanner.nextLine();//await answer
 			}
-			if (qbtf.answerCorrect(answer, qa.getCorrectAnswer())) {rightAnswers++;}
+			if (qbtf.answerCorrect(answer)) {rightAnswers++;}
+			qCount++;
 		}  
 		scanner.close();//close input detector
 		//EXAM QUESTIONS END\\
